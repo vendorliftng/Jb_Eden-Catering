@@ -324,7 +324,13 @@
     </div>
 
     <!-- Scripts -->
+   <!-- Master Application Logic -->
     <script>
+        // 1. Core State
+        let cart = [];
+        const WHATSAPP_NUMBER = "447756346343"; // UK Code + Number
+
+        // 2. UI Toggles
         function filterCategory(category) {
             document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('btn-' + category).classList.add('active');
@@ -337,9 +343,162 @@
                 }
             });
         }
+
         function toggleCart() {
             document.getElementById('cartDrawer').classList.toggle('active');
             document.getElementById('cartOverlay').classList.toggle('active');
+        }
+
+        // 3. Smart Button Binding (Auto-detects items and prices)
+        document.addEventListener('DOMContentLoaded', () => {
+            const addButtons = document.querySelectorAll('.menu-card .btn-dark');
+            addButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const card = e.target.closest('.menu-card');
+                    const title = card.querySelector('.card-title').innerText;
+                    // Clean the price text (remove £ and 'From ') to get a raw number
+                    const priceText = card.querySelector('.card-price').innerText;
+                    const price = parseFloat(priceText.replace(/[^0-9.]/g, ''));
+                    
+                    addToCart(title, price);
+                    
+                    // Visual feedback: change button text temporarily
+                    const originalText = e.target.innerText;
+                    e.target.innerText = "Added ✓";
+                    e.target.style.backgroundColor = "#10B981"; // Success green
+                    setTimeout(() => {
+                        e.target.innerText = originalText;
+                        e.target.style.backgroundColor = ""; // Reset
+                    }, 1000);
+                });
+            });
+        });
+
+        // 4. Cart Logic
+        function addToCart(title, price) {
+            const existingItem = cart.find(item => item.title === title);
+            if (existingItem) {
+                existingItem.qty += 1;
+            } else {
+                cart.push({ title, price, qty: 1 });
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const cartBody = document.querySelector('.cart-body');
+            const cartTotalEl = document.querySelector('.cart-total span:last-child');
+            const floatingBtn = document.querySelector('.floating-cart');
+            const navBtn = document.querySelector('nav .btn-dark');
+            
+            // Calculate Total and Item Count
+            let total = 0;
+            let itemCount = 0;
+            
+            // Generate HTML for cart items
+            let itemsHTML = '';
+            if (cart.length === 0) {
+                itemsHTML = `
+                    <div style="text-align: center; color: #4B5563; margin-top: 40px;">
+                        <p>Your cart is empty.</p>
+                        <p style="font-size: 13px; margin-top: 8px;">Add some authentic flavors to get started!</p>
+                    </div>`;
+            } else {
+                cart.forEach((item, index) => {
+                    total += item.price * item.qty;
+                    itemCount += item.qty;
+                    itemsHTML += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E5E7EB; padding: 12px 0; margin-bottom: 8px;">
+                            <div>
+                                <h4 style="font-size: 15px; color: #111827; margin-bottom: 4px;">${item.title}</h4>
+                                <span style="font-size: 14px; color: #DC2626; font-weight: bold;">£${item.price.toFixed(2)} x ${item.qty}</span>
+                            </div>
+                            <button onclick="removeFromCart(${index})" style="background: none; border: none; color: #9CA3AF; cursor: pointer; font-size: 18px;">&times;</button>
+                        </div>
+                    `;
+                });
+                
+                // Append the checkout form below the items
+                itemsHTML += `
+                    <div class="checkout-form" style="margin-top: 24px; border-top: 2px solid #E5E7EB; padding-top: 24px;">
+                        <h4 style="margin-bottom: 16px; font-family: 'Montserrat', sans-serif;">Checkout Details</h4>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px;">Full Name *</label>
+                            <input type="text" id="custName" style="width: 100%; padding: 10px; border: 1px solid #E5E7EB; border-radius: 6px;" placeholder="John Doe">
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px;">Delivery or Pickup?</label>
+                            <select id="custMethod" style="width: 100%; padding: 10px; border: 1px solid #E5E7EB; border-radius: 6px;">
+                                <option>Pickup from Epsom</option>
+                                <option>Local Delivery</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px;">Dietary Notes / Allergies</label>
+                            <textarea id="custNotes" rows="2" style="width: 100%; padding: 10px; border: 1px solid #E5E7EB; border-radius: 6px;" placeholder="e.g., No onions, strict gluten-free"></textarea>
+                        </div>
+                        <div style="background: #F3F4F6; padding: 16px; border-radius: 8px; font-size: 13px;">
+                            <strong>Payment: Bank Transfer</strong><br>
+                            Please transfer the total to:<br>
+                            Acc Name: JB Eden Catering Ltd<br>
+                            Sort Code: 12-34-56<br>
+                            Acc No: 12345678
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Update DOM
+            cartBody.innerHTML = itemsHTML;
+            cartTotalEl.innerText = `£${total.toFixed(2)}`;
+            floatingBtn.innerText = `🛒 View Cart (${itemCount})`;
+            navBtn.innerText = `Cart (${itemCount})`;
+            
+            // Show/Hide checkout button based on cart state
+            const whatsappBtn = document.querySelector('.btn-whatsapp');
+            if (whatsappBtn) {
+                whatsappBtn.style.display = cart.length > 0 ? 'block' : 'none';
+                if(cart.length > 0) {
+                    whatsappBtn.onclick = () => checkoutWhatsApp(total);
+                }
+            }
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        // 5. WhatsApp Order Compiler
+        function checkoutWhatsApp(total) {
+            const name = document.getElementById('custName').value.trim();
+            const method = document.getElementById('custMethod').value;
+            const notes = document.getElementById('custNotes').value.trim();
+
+            if (!name) {
+                alert("Please enter your name for the order.");
+                return;
+            }
+
+            // Build the message
+            let msg = `*NEW TAKEOUT ORDER* 🍲\n\n`;
+            msg += `*Name:* ${name}\n`;
+            msg += `*Method:* ${method}\n`;
+            if (notes) msg += `*Notes:* ${notes}\n`;
+            msg += `\n*ORDER DETAILS:*\n`;
+            
+            cart.forEach(item => {
+                msg += `- ${item.qty}x ${item.title} (£${item.price.toFixed(2)})\n`;
+            });
+            
+            msg += `\n*TOTAL DUE:* £${total.toFixed(2)}\n`;
+            msg += `\n_I will process the bank transfer shortly._`;
+
+            // Encode for URL and open WhatsApp
+            const encodedMsg = encodeURIComponent(msg);
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMsg}`;
+            
+            window.open(whatsappUrl, '_blank');
         }
     </script>
 </body>
