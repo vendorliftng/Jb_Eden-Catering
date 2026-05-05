@@ -183,6 +183,15 @@
         <button class="cat-btn" onclick="filterCategory('soups')" id="btn-soups">Soups & Swallows</button>
     </div>
 
+    <!-- Smart Search Bar -->
+    <div class="container" style="max-width: 600px; margin: 0 auto 20px; padding: 0 24px;">
+        <div style="position: relative;">
+            <input type="text" id="menuSearch" oninput="handleSearch()" placeholder="Search for Jollof, Jerk, Soups..." 
+                   style="width: 100%; padding: 14px 20px 14px 45px; border: 2px solid var(--gray-light); border-radius: 50px; font-size: 16px; font-family: var(--font-body); transition: border-color 0.3s; outline: none;">
+            <span style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 18px;">🔍</span>
+        </div>
+    </div>
+
     <section class="section-padding container">
         
         <div class="category-block" id="cat-starters">
@@ -324,52 +333,143 @@
     </div>
 
     <!-- Scripts -->
-   <!-- Master Application Logic -->
-    <!-- Master Application Logic (API Connected) -->
+   <!-- ========================================== -->
+    <!-- MASTER APPLICATION LOGIC (V2.0)            -->
+    <!-- ========================================== -->
     <script>
-        // 1. Core State & API Configuration
+        // 1. Core State
         let cart = [];
+        let masterMenuData = [];
+        let currentCategory = 'all';
+        let searchQuery = '';
+        let isMenuExpanded = false;
+        const INITIAL_DISPLAY_COUNT = 6;
+        
         const WHATSAPP_NUMBER = "447756346343"; 
         const API_URL = "https://script.google.com/macros/s/AKfycbz5uIkcDDIlVbBeq1QACFm45U4xPmj8pHPhNISydpBkDKanJFKnxW9DQ-ir3mgRwYtn/exec";
 
-        // 2. Initializing App & Fetching Live Data
+        // 2. Initialization
         document.addEventListener('DOMContentLoaded', () => {
             loadMenuFromGoogleSheets();
+            initCountdown();
         });
 
+        // 3. Dynamic Countdown Logic
+        function initCountdown() {
+            const bannerSpan = document.querySelector('.countdown span');
+            const countdownDiv = document.querySelector('.countdown');
+
+            function updateTimer() {
+                const now = new Date();
+                const day = now.getDay(); // 0=Sun, 1=Mon... 5=Fri, 6=Sat
+                const hour = now.getHours();
+
+                // Check if Kitchen is currently OPEN (Fri, Sat, Sun between 16:00 and 21:00)
+                if ((day === 5 || day === 6 || day === 0) && hour >= 16 && hour < 21) {
+                    bannerSpan.innerHTML = "KITCHEN IS LIVE! ORDER NOW 🟢";
+                    bannerSpan.style.backgroundColor = "#10B981"; // Success Green
+                    bannerSpan.style.color = "white";
+                    countdownDiv.style.backgroundColor = "#047857"; // Darker green background
+                    return;
+                }
+
+                // Calculate next Friday at 16:00 (4 PM)
+                let daysUntilFriday = (5 - day + 7) % 7;
+                if (daysUntilFriday === 0 && hour >= 21) daysUntilFriday = 7; // If past 9PM Friday, aim for next week
+                
+                let nextOpen = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntilFriday, 16, 0, 0);
+                
+                const diff = nextOpen - now;
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const m = Math.floor((diff / 1000 / 60) % 60);
+                const s = Math.floor((diff / 1000) % 60);
+
+                // Format with leading zeros
+                const formattedTime = `${d}d : ${h.toString().padStart(2, '0')}h : ${m.toString().padStart(2, '0')}m : ${s.toString().padStart(2, '0')}s`;
+                
+                bannerSpan.innerHTML = formattedTime;
+                bannerSpan.style.backgroundColor = "var(--dark)";
+                countdownDiv.style.backgroundColor = "var(--amber)";
+            }
+            
+            updateTimer(); // Run once immediately
+            setInterval(updateTimer, 1000); // Update every second
+        }
+
+        // 4. Data Fetching
         async function loadMenuFromGoogleSheets() {
             try {
                 const response = await fetch(API_URL);
                 const items = await response.json();
-                renderDynamicMenu(items);
+                
+                // Clean data and store globally
+                masterMenuData = items.filter(item => !isNaN(parseFloat(item.price)));
+                renderDynamicMenu();
             } catch (error) {
-                console.error("Failed to load live menu, falling back to cached view.", error);
-                // If the internet is down, it just leaves the hardcoded HTML intact. Safe fallback!
+                console.error("Failed to load live menu.", error);
             }
         }
 
-        // 3. Dynamic Rendering Engine
-        function renderDynamicMenu(items) {
-            // First, clear the hardcoded HTML grids so we don't have duplicates
-            document.querySelector('#cat-starters .menu-grid').innerHTML = '';
-            document.querySelector('#cat-mains .menu-grid').innerHTML = '';
-            document.querySelector('#cat-soups .menu-grid').innerHTML = '';
+        // 5. Search & Filter Logic
+        function handleSearch() {
+            searchQuery = document.getElementById('menuSearch').value.toLowerCase();
+            isMenuExpanded = true; // Auto-expand menu when searching
+            renderDynamicMenu();
+        }
 
-            items.forEach(item => {
-                // Safety check: ensure price is a valid number
+        function filterCategory(category) {
+            currentCategory = category;
+            
+            // Update Active Button UI
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn-' + category).classList.add('active');
+            
+            isMenuExpanded = false; // Reset expansion on category change
+            renderDynamicMenu();
+        }
+
+        function expandMenu() {
+            isMenuExpanded = true;
+            renderDynamicMenu();
+        }
+
+        // 6. Rendering Engine (Handles Search, Filter, and Expand)
+        function renderDynamicMenu() {
+            const grids = {
+                'starters': document.querySelector('#cat-starters .menu-grid'),
+                'mains': document.querySelector('#cat-mains .menu-grid'),
+                'soups': document.querySelector('#cat-soups .menu-grid')
+            };
+
+            // Clear all grids
+            Object.values(grids).forEach(grid => { if (grid) grid.innerHTML = ''; });
+            document.querySelectorAll('.category-block').forEach(block => block.style.display = 'none');
+
+            // Apply Filters and Search
+            let filteredData = masterMenuData.filter(item => {
+                const matchesCat = currentCategory === 'all' || item.category.toLowerCase().trim() === currentCategory;
+                const matchesSearch = item.title.toLowerCase().includes(searchQuery) || item.description.toLowerCase().includes(searchQuery);
+                return matchesCat && matchesSearch;
+            });
+
+            // Handle Expansion Logic
+            let itemsToRender = isMenuExpanded ? filteredData : filteredData.slice(0, INITIAL_DISPLAY_COUNT);
+
+            // Render Cards
+            itemsToRender.forEach(item => {
                 const priceNum = parseFloat(item.price);
-                if (isNaN(priceNum)) return; 
-
-                // Handle Sold Out state directly from the Google Sheet
                 const isSoldOut = item.status && item.status.toString().toLowerCase() === 'sold out';
+                
                 const buttonHTML = isSoldOut 
                     ? `<button class="btn" style="width: 100%; margin-top: auto; background-color: #9CA3AF; color: white; cursor: not-allowed;" disabled>Sold Out</button>`
                     : `<button class="btn btn-dark" style="width: 100%; margin-top: auto;" onclick="handleAddToCart(this, '${item.title.replace(/'/g, "\\'")}', ${priceNum})">Add to Cart</button>`;
 
-                // Build the Card HTML
+                const safeImage = item.image_url ? `<img src="${item.image_url}" style="width:100%; height:100%; object-fit:cover;">` : `[Image: ${item.title}]`;
+
                 const html = `
                 <div class="menu-card">
-                    <div class="card-img" style="font-size: 13px;">[Image: ${item.title}]</div>
+                    <div class="card-img" style="font-size: 13px; overflow:hidden;">${safeImage}</div>
                     <div class="card-body">
                         <div class="card-header">
                             <h3 class="card-title">${item.title}</h3>
@@ -380,38 +480,39 @@
                     </div>
                 </div>`;
 
-                // Find the correct category tab (must match 'starters', 'mains', or 'soups' in your Sheet)
                 const targetCategory = item.category ? item.category.toLowerCase().trim() : '';
-                const targetGrid = document.querySelector(`#cat-${targetCategory} .menu-grid`);
+                if (grids[targetCategory]) {
+                    document.querySelector(`#cat-${targetCategory}`).style.display = 'block'; // Show category block
+                    grids[targetCategory].innerHTML += html;
+                }
+            });
+
+            // Add "View Full Menu" Button if not expanded and there are more items
+            if (!isMenuExpanded && filteredData.length > INITIAL_DISPLAY_COUNT) {
+                // Find the last visible category block to append the button
+                const visibleBlocks = Array.from(document.querySelectorAll('.category-block')).filter(b => b.style.display === 'block');
+                const lastBlock = visibleBlocks[visibleBlocks.length - 1];
                 
-                if (targetGrid) {
-                    targetGrid.innerHTML += html; // Inject the card!
+                if (lastBlock) {
+                    const expandHtml = `
+                        <div style="text-align: center; grid-column: 1 / -1; margin-top: 24px;">
+                            <button onclick="expandMenu()" class="btn btn-outline" style="color: var(--dark); border-color: var(--dark); width: 100%; max-width: 300px;">
+                                View ${filteredData.length - INITIAL_DISPLAY_COUNT} More Items ↓
+                            </button>
+                        </div>
+                    `;
+                    lastBlock.querySelector('.menu-grid').innerHTML += expandHtml;
                 }
-            });
+            }
         }
 
-        // 4. UI Interactions
-        function filterCategory(category) {
-            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('btn-' + category).classList.add('active');
-            const sections = document.querySelectorAll('.category-block');
-            sections.forEach(sec => {
-                if (category === 'all') {
-                    sec.style.display = 'block';
-                } else {
-                    sec.style.display = sec.id === 'cat-' + category ? 'block' : 'none';
-                }
-            });
-        }
-
+        // 7. Cart & UI Toggles
         function toggleCart() {
             document.getElementById('cartDrawer').classList.toggle('active');
             document.getElementById('cartOverlay').classList.toggle('active');
         }
 
-        // 5. Cart Logic
         function handleAddToCart(btnElement, title, price) {
-            // Add to the backend array
             const existingItem = cart.find(item => item.title === title);
             if (existingItem) {
                 existingItem.qty += 1;
@@ -420,7 +521,6 @@
             }
             updateCartUI();
 
-            // Provide visual feedback
             const originalText = btnElement.innerText;
             btnElement.innerText = "Added ✓";
             btnElement.style.backgroundColor = "#10B981";
@@ -428,6 +528,14 @@
                 btnElement.innerText = originalText;
                 btnElement.style.backgroundColor = ""; 
             }, 1000);
+        }
+
+        function changeQty(index, delta) {
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) {
+                cart.splice(index, 1); // Remove item if qty drops to 0
+            }
+            updateCartUI();
         }
 
         function updateCartUI() {
@@ -453,13 +561,21 @@
             cart.forEach((item, index) => {
                 total += item.price * item.qty;
                 itemCount += item.qty;
+                
+                // NEW: Cart Item HTML with +/- Controls
                 itemsHTML += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E5E7EB; padding: 12px 0; margin-bottom: 8px;">
-                        <div>
-                            <h4 style="font-size: 15px; color: #111827; margin-bottom: 4px;">${item.title}</h4>
-                            <span style="font-size: 14px; color: #DC2626; font-weight: bold;">£${item.price.toFixed(2)} x ${item.qty}</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E5E7EB; padding: 16px 0; margin-bottom: 8px;">
+                        <div style="flex: 1; padding-right: 12px;">
+                            <h4 style="font-size: 14px; color: #111827; margin-bottom: 6px; line-height: 1.2;">${item.title}</h4>
+                            <span style="font-size: 14px; color: #DC2626; font-weight: bold;">£${(item.price * item.qty).toFixed(2)}</span>
                         </div>
-                        <button onclick="removeFromCart(${index})" style="background: none; border: none; color: #9CA3AF; cursor: pointer; font-size: 18px;">&times;</button>
+                        
+                        <!-- + / - Controls -->
+                        <div style="display: flex; align-items: center; border: 1px solid #E5E7EB; border-radius: 6px; overflow: hidden;">
+                            <button onclick="changeQty(${index}, -1)" style="background: #F9FAFB; border: none; padding: 8px 12px; cursor: pointer; font-weight: bold; color: var(--dark); transition: background 0.2s;">-</button>
+                            <span style="padding: 0 12px; font-weight: bold; font-size: 14px;">${item.qty}</span>
+                            <button onclick="changeQty(${index}, 1)" style="background: #F9FAFB; border: none; border-left: 1px solid #E5E7EB; border-right: 1px solid #E5E7EB; padding: 8px 12px; cursor: pointer; font-weight: bold; color: var(--dark); transition: background 0.2s;">+</button>
+                        </div>
                     </div>
                 `;
             });
@@ -524,20 +640,11 @@
 
             document.getElementById('custMethod').addEventListener('change', function() {
                 const addressGroup = document.getElementById('addressGroup');
-                if (this.value === 'Delivery') {
-                    addressGroup.style.display = 'block';
-                } else {
-                    addressGroup.style.display = 'none';
-                }
+                addressGroup.style.display = this.value === 'Delivery' ? 'block' : 'none';
             });
         }
 
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCartUI();
-        }
-
-        // 6. Final Checkout Compiler
+        // 8. Final Checkout
         function checkoutWhatsApp(total) {
             const name = document.getElementById('custName').value.trim();
             const method = document.getElementById('custMethod').value;
@@ -545,37 +652,23 @@
             const urgency = document.getElementById('custUrgency').value;
             const notes = document.getElementById('custNotes').value.trim();
 
-            if (!name) {
-                alert("Please enter your name to complete the order.");
-                return;
-            }
-
-            if (method === 'Delivery' && !address) {
-                alert("Please enter your delivery address.");
-                return;
-            }
+            if (!name) { alert("Please enter your name to complete the order."); return; }
+            if (method === 'Delivery' && !address) { alert("Please enter your delivery address."); return; }
 
             let msg = `*NEW TAKEOUT ORDER* 🍲\n\n`;
-            msg += `*Name:* ${name}\n`;
-            msg += `*Method:* ${method}\n`;
-            if (method === 'Delivery') {
-                msg += `*Address:* ${address}\n`;
-            }
+            msg += `*Name:* ${name}\n*Method:* ${method}\n`;
+            if (method === 'Delivery') msg += `*Address:* ${address}\n`;
             msg += `*Timing:* ${urgency}\n`;
             if (notes) msg += `*Notes:* ${notes}\n`;
             msg += `\n*ORDER DETAILS:*\n`;
             
             cart.forEach(item => {
-                msg += `- ${item.qty}x ${item.title} (£${item.price.toFixed(2)})\n`;
+                msg += `- ${item.qty}x ${item.title} (£${(item.price * item.qty).toFixed(2)})\n`;
             });
             
-            msg += `\n*TOTAL DUE:* £${total.toFixed(2)}\n`;
-            msg += `\n_Please confirm receipt!_`;
+            msg += `\n*TOTAL DUE:* £${total.toFixed(2)}\n\n_Please confirm receipt!_`;
 
-            const encodedMsg = encodeURIComponent(msg);
-            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMsg}`;
-            
-            window.open(whatsappUrl, '_blank');
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
         }
     </script>
 </body>
