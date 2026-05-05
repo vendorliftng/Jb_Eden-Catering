@@ -4,88 +4,98 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JB Eden Catering | Authentic Afro-Caribbean Food in Surrey</title>
-    <meta name="description" content="Premium Afro-Caribbean catering and exclusive weekend takeout in Epsom, Surrey. Order authentic Jollof, Jerk Chicken, and more.">
+    <meta name="description" content="Premium Afro-Caribbean catering and exclusive weekend takeout in Epsom, Surrey. Order authentic Jollof, Jerk Chicken, Egusi, and more.">
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- PRODUCTION-READY CUSTOM CSS -->
     <style>
         :root {
-            --dark: #1A1A1A;
-            --light: #FAFAFA;
-            --accent: #D92525;
-            --accent-hover: #b91c1c;
+            --dark: #111827;
+            --light: #F9FAFB;
+            --white: #FFFFFF;
+            --accent: #DC2626; /* Deeper, richer red */
+            --accent-hover: #B91C1C;
             --amber: #F59E0B;
-            --gray-text: #4b5563;
-            --gray-border: #e5e7eb;
+            --gray-text: #4B5563;
+            --gray-light: #E5E7EB;
             --font-heading: 'Montserrat', sans-serif;
             --font-body: 'Inter', sans-serif;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
-        body { font-family: var(--font-body); background-color: var(--light); color: var(--dark); line-height: 1.5; }
+        body { font-family: var(--font-body); background-color: var(--light); color: var(--dark); line-height: 1.6; }
         
         .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
         
-        /* Navigation */
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; position: sticky; top: 0; background: var(--light); z-index: 100; }
-        .logo { font-family: var(--font-heading); font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+        /* Premium Navigation */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; position: sticky; top: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); z-index: 100; border-bottom: 1px solid var(--gray-light); }
+        .logo { font-family: var(--font-heading); font-size: 26px; font-weight: 800; letter-spacing: -1px; }
         .logo span { color: var(--accent); }
-        .nav-links { display: none; gap: 32px; font-weight: 600; }
-        .nav-links a { text-decoration: none; color: var(--dark); transition: color 0.2s; }
+        .nav-links { display: none; gap: 40px; font-weight: 600; }
+        .nav-links a { text-decoration: none; color: var(--gray-text); transition: color 0.2s; }
         .nav-links a:hover { color: var(--accent); }
         @media (min-width: 768px) { .nav-links { display: flex; } }
         
         /* Buttons */
-        .btn { display: inline-block; padding: 12px 24px; border-radius: 8px; font-weight: 700; text-decoration: none; cursor: pointer; transition: all 0.2s; border: none; font-size: 16px; text-align: center; }
-        .btn-primary { background-color: var(--accent); color: white; }
-        .btn-primary:hover { background-color: var(--accent-hover); transform: translateY(-2px); }
-        .btn-outline { background-color: transparent; color: white; border: 2px solid white; }
-        .btn-outline:hover { background-color: white; color: var(--dark); transform: translateY(-2px); }
-        .btn-dark { background-color: var(--dark); color: white; padding: 8px 16px; font-size: 14px; }
+        .btn { display: inline-block; padding: 14px 28px; border-radius: 8px; font-weight: 700; text-decoration: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: none; font-size: 16px; text-align: center; }
+        .btn-primary { background-color: var(--accent); color: var(--white); box-shadow: var(--shadow-md); }
+        .btn-primary:hover { background-color: var(--accent-hover); transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .btn-outline { background-color: transparent; color: var(--white); border: 2px solid var(--white); }
+        .btn-outline:hover { background-color: var(--white); color: var(--dark); transform: translateY(-2px); }
+        .btn-dark { background-color: var(--dark); color: var(--white); padding: 10px 20px; font-size: 14px; border-radius: 6px; }
         .btn-dark:hover { background-color: var(--accent); }
 
         /* Hero Section */
-        .hero { position: relative; background-color: var(--dark); color: white; text-align: center; padding: 100px 24px; overflow: hidden; }
-        .hero-bg { position: absolute; inset: 0; background: #2d3748; opacity: 0.4; z-index: 0; }
+        .hero { position: relative; background-color: var(--dark); color: var(--white); text-align: center; padding: 120px 24px; overflow: hidden; }
+        .hero-bg { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(17, 24, 39, 0.8), rgba(17, 24, 39, 0.95)), url('https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover; z-index: 0; }
         .hero-content { position: relative; z-index: 10; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
-        .location-badge { background: var(--accent); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; padding: 4px 12px; border-radius: 20px; font-weight: 700; margin-bottom: 24px; }
-        .hero h1 { font-family: var(--font-heading); font-size: 48px; line-height: 1.1; margin-bottom: 24px; }
+        .location-badge { background: var(--accent); font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; padding: 6px 16px; border-radius: 30px; font-weight: 700; margin-bottom: 24px; box-shadow: var(--shadow-sm); }
+        .hero h1 { font-family: var(--font-heading); font-size: 52px; line-height: 1.1; margin-bottom: 24px; letter-spacing: -1px; }
         .hero h1 span { color: var(--amber); }
-        .hero p { font-size: 18px; color: #e2e8f0; margin-bottom: 40px; }
+        .hero p { font-size: 20px; color: #D1D5DB; margin-bottom: 40px; font-weight: 400; }
         .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
-        @media (min-width: 768px) { .hero h1 { font-size: 64px; } .hero p { font-size: 20px; } }
+        @media (min-width: 768px) { .hero h1 { font-size: 72px; } .hero p { font-size: 22px; } }
 
         /* Countdown Banner */
-        .countdown { background: var(--dark); color: var(--amber); text-align: center; padding: 12px; position: sticky; top: 68px; z-index: 90; border-bottom: 4px solid var(--accent); font-family: var(--font-heading); font-weight: 700; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
-        .countdown span { color: white; margin-left: 8px; }
+        .countdown { background: var(--amber); color: var(--dark); text-align: center; padding: 14px; position: sticky; top: 76px; z-index: 90; font-family: var(--font-heading); font-weight: 800; font-size: 15px; letter-spacing: 1px; text-transform: uppercase; box-shadow: var(--shadow-md); }
+        .countdown span { color: var(--white); background: var(--dark); padding: 4px 10px; border-radius: 4px; margin-left: 8px; }
+
+        /* SEO About Section */
+        .seo-about { padding: 80px 0 40px 0; text-align: center; max-width: 800px; margin: 0 auto; }
+        .seo-about h2 { font-family: var(--font-heading); font-size: 32px; color: var(--dark); margin-bottom: 16px; }
+        .seo-about p { font-size: 18px; color: var(--gray-text); }
 
         /* Menu Section */
-        .menu-section { padding: 80px 0; }
-        .section-header { text-align: center; margin-bottom: 48px; }
-        .section-header h2 { font-family: var(--font-heading); font-size: 36px; margin-bottom: 12px; }
-        .section-header p { color: var(--gray-text); }
-
-        /* Dietary Filters */
-        .filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-bottom: 48px; }
-        .filter-btn { padding: 8px 24px; border-radius: 30px; border: 2px solid var(--gray-border); background: transparent; color: var(--gray-text); font-weight: 700; font-size: 14px; cursor: pointer; transition: all 0.2s; }
-        .filter-btn:hover { border-color: var(--dark); }
-        .filter-btn.active { background: var(--dark); color: white; border-color: var(--dark); }
+        .menu-section { padding: 40px 0 100px 0; }
+        .category-title { font-family: var(--font-heading); font-size: 28px; color: var(--dark); margin: 60px 0 30px 0; padding-bottom: 10px; border-bottom: 3px solid var(--accent); display: inline-block; }
 
         /* Menu Grid */
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 32px; }
-        .menu-card { background: white; border-radius: 12px; border: 1px solid var(--gray-border); overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; }
-        .menu-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .card-img { height: 200px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-weight: 500; }
-        .card-body { padding: 24px; }
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-        .card-title { font-family: var(--font-heading); font-size: 20px; }
-        .card-price { color: var(--accent); font-weight: 700; font-size: 18px; }
-        .card-desc { color: var(--gray-text); font-size: 14px; margin-bottom: 16px; min-height: 42px; }
-        .card-footer { display: flex; justify-content: space-between; align-items: center; }
-        .diet-tags { font-size: 12px; font-weight: 700; color: #9ca3af; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 32px; }
+        .menu-card { background: var(--white); border-radius: 16px; border: 1px solid var(--gray-light); overflow: hidden; transition: all 0.3s ease; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; }
+        .menu-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: transparent; }
+        .card-img { height: 220px; background: var(--gray-light); display: flex; align-items: center; justify-content: center; color: #9CA3AF; font-weight: 600; font-size: 14px; }
+        .card-body { padding: 24px; display: flex; flex-direction: column; flex-grow: 1; }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .card-title { font-family: var(--font-heading); font-size: 22px; line-height: 1.2; color: var(--dark); }
+        .card-price { color: var(--accent); font-weight: 800; font-size: 20px; }
+        .card-desc { color: var(--gray-text); font-size: 15px; margin-bottom: 24px; flex-grow: 1; line-height: 1.5; }
+        .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--gray-light); padding-top: 16px; }
+        .diet-tags { font-size: 13px; font-weight: 700; color: #6B7280; background: #F3F4F6; padding: 4px 10px; border-radius: 20px; }
+
+        /* Footer */
+        footer { background-color: var(--dark); color: var(--white); padding: 80px 24px 40px; }
+        .footer-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px; }
+        .footer-col h4 { font-family: var(--font-heading); font-size: 20px; margin-bottom: 20px; color: var(--amber); }
+        .footer-col p, .footer-col a { color: #9CA3AF; margin-bottom: 12px; text-decoration: none; display: block; font-size: 15px; }
+        .footer-col a:hover { color: var(--white); }
+        .footer-bottom { text-align: center; padding-top: 24px; border-top: 1px solid #374151; color: #6B7280; font-size: 14px; max-width: 1200px; margin: 0 auto; }
     </style>
 </head>
 <body>
@@ -94,114 +104,215 @@
         <div class="container" style="display: flex; justify-content: space-between; width: 100%;">
             <div class="logo">JB EDEN<span>.</span></div>
             <div class="nav-links">
-                <a href="#takeout">Weekend Takeout</a>
+                <a href="#about">Our Roots</a>
+                <a href="#menu">Weekend Menu</a>
                 <a href="#catering">Catering</a>
             </div>
-            <button class="btn btn-dark">Cart (0)</button>
+            <button class="btn btn-dark">Order Cart (0)</button>
         </div>
     </nav>
 
     <section class="hero">
         <div class="hero-bg"></div>
         <div class="hero-content">
-            <span class="location-badge">Epsom, Surrey</span>
+            <span class="location-badge">Based in Epsom, Surrey</span>
             <h1>Authentic Afro-Caribbean Flavors, <span>Delivered.</span></h1>
-            <p>Premium catering for your unforgettable events, and exclusive weekend takeout for your cravings.</p>
+            <p>Premium catering for your unforgettable events, and an exclusive weekend takeout menu to satisfy your cravings.</p>
             <div class="hero-buttons">
-                <a href="#takeout" class="btn btn-primary">Order Weekend Takeout</a>
+                <a href="#menu" class="btn btn-primary">View Takeout Menu</a>
                 <a href="#catering" class="btn btn-outline">Book Event Catering</a>
             </div>
         </div>
     </section>
 
-    <div id="takeout" class="countdown">
+    <div class="countdown">
         Live Ordering Unlocks In: <span>02d : 04h : 15m</span>
     </div>
 
-    <section class="menu-section container">
-        <div class="section-header">
-            <h2>Weekend Takeout Menu</h2>
-            <p>Available Friday, Saturday, and Sunday 4 PM - 9 PM.</p>
-        </div>
+    <!-- SEO Optimized Intro -->
+    <section id="about" class="seo-about container">
+        <h2>Taste the Tropics in Surrey</h2>
+        <p>JB Eden Catering brings the vibrant, soul-warming spices of West Africa and the Caribbean directly to Epsom. Whether you are craving the smoky perfection of our authentic Jollof Rice, the fiery kick of Jamaican Jerk Chicken, or a luxurious bowl of Egusi, our kitchen prepares every dish fresh, using locally sourced ingredients and generations of culinary tradition.</p>
+    </section>
 
-        <div class="filters">
-            <button class="filter-btn active" onclick="filterMenu('all')" id="btn-all">All Items</button>
-            <button class="filter-btn" onclick="filterMenu('gf')" id="btn-gf">🌾 Gluten-Free</button>
-            <button class="filter-btn" onclick="filterMenu('vegan')" id="btn-vegan">🌱 Vegan</button>
-            <button class="filter-btn" onclick="filterMenu('halal')" id="btn-halal">🥩 Halal</button>
-        </div>
-
-        <div class="menu-grid" id="menu-container">
-            <!-- Item 1: Jerk Chicken -->
-            <div class="menu-card halal">
-                <div class="card-img">Image: Jerk chicken tray</div>
-                <div class="card-body">
-                    <div class="card-header">
-                        <h3 class="card-title">Jerk Chicken</h3>
-                        <span class="card-price">£9.00</span>
-                    </div>
-                    <p class="card-desc">Well spiced and tender juicy chicken with our chef's made spot on Jerk sauce.</p>
-                    <div class="card-footer">
-                        <span class="diet-tags">🥩 Halal</span>
-                        <button class="btn btn-dark">Add</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Item 2: Jollof Rice -->
-            <div class="menu-card vegan gf halal">
-                <div class="card-img">Image: Jollof</div>
-                <div class="card-body">
-                    <div class="card-header">
-                        <h3 class="card-title">Jollof Rice</h3>
-                        <span class="card-price">£7.00</span>
-                    </div>
-                    <p class="card-desc">Authentic Nigeria Jollofness made with a unique blend of peppers, spices, a special touch of Love.</p>
-                    <div class="card-footer">
-                        <span class="diet-tags">🌱 Vegan • 🌾 GF • 🥩 Halal</span>
-                        <button class="btn btn-dark">Add</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Item 3: Moin Moin -->
-            <div class="menu-card gf halal">
-                <div class="card-img">Image: Moin Moin</div>
+    <section id="menu" class="menu-section container">
+        
+        <!-- Category: Starters & Sides -->
+        <h3 class="category-title">Starters & Sides</h3>
+        <div class="menu-grid">
+            <div class="menu-card">
+                <div class="card-img">[Image: Moin Moin]</div>
                 <div class="card-body">
                     <div class="card-header">
                         <h3 class="card-title">Moin Moin with Egg</h3>
                         <span class="card-price">£3.50</span>
                     </div>
-                    <p class="card-desc">A delicious blended black-eye beans made with crayfish or with steamed mackerel and boiled eggs.</p>
+                    <p class="card-desc">Delicious blended black-eye beans made with crayfish and boiled eggs.</p>
                     <div class="card-footer">
-                        <span class="diet-tags">🌾 GF • 🥩 Halal</span>
-                        <button class="btn btn-dark">Add</button>
+                        <span class="diet-tags">Halal</span>
+                        <button class="btn btn-dark">Add to Order</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-card">
+                <div class="card-img">[Image: Jamaican Patties]</div>
+                <div class="card-body">
+                    <div class="card-header">
+                        <h3 class="card-title">Jamaican Patties</h3>
+                        <span class="card-price">£3.00</span>
+                    </div>
+                    <p class="card-desc">Authentic protein-filled pastry. Choice of lamb, chicken, or beef.</p>
+                    <div class="card-footer">
+                        <span class="diet-tags">Halal</span>
+                        <button class="btn btn-dark">Add to Order</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-card">
+                <div class="card-img">[Image: Fried Yam]</div>
+                <div class="card-body">
+                    <div class="card-header">
+                        <h3 class="card-title">Fried Yam & Stew</h3>
+                        <span class="card-price">£4.50</span>
+                    </div>
+                    <p class="card-desc">Simply fried fleshy yam served with our spicy black sauce.</p>
+                    <div class="card-footer">
+                        <span class="diet-tags">Vegetarian</span>
+                        <button class="btn btn-dark">Add to Order</button>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Category: Mains & Rice -->
+        <h3 class="category-title">Mains & Rice</h3>
+        <div class="menu-grid">
+            <div class="menu-card">
+                <div class="card-img">[Image: Jollof]</div>
+                <div class="card-body">
+                    <div class="card-header">
+                        <h3 class="card-title">JB-Eden Jollof Rice</h3>
+                        <span class="card-price">£7.00</span>
+                    </div>
+                    <p class="card-desc">Authentic Nigeria Jollofness made with a unique blend of peppers, spices, and love.</p>
+                    <div class="card-footer">
+                        <span class="diet-tags">Vegan • GF</span>
+                        <button class="btn btn-dark">Add to Order</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-card">
+                <div class="card-img">[Image: Jerk Chicken]</div>
+                <div class="card-body">
+                    <div class="card-header">
+                        <h3 class="card-title">Jerk Chicken</h3>
+                        <span class="card-price">£9.00</span>
+                    </div>
+                    <p class="card-desc">Tender juicy chicken marinated in our chef's spot-on signature Jerk sauce.</p>
+                    <div class="card-footer">
+                        <span class="diet-tags">Halal</span>
+                        <button class="btn btn-dark">Add to Order</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-card">
+                <div class="card-img">[Image: Rice & Peas]</div>
+                <div class="card-body">
+                    <div class="card-header">
+                        <h3 class="card-title">Rice & Peas</h3>
+                        <span class="card-price">£6.00</span>
+                    </div>
+                    <p class="card-desc">Authentic Jamaican rice and kidney beans. Perfect pairing for our proteins.</p>
+                    <div class="card-footer">
+                        <span class="diet-tags">Vegan • GF</span>
+                        <button class="btn btn-dark">Add to Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category: Authentic Soups & Swallows -->
+        <h3 class="category-title">Authentic Soups & Swallows</h3>
+        <div class="menu-grid">
+            <div class="menu-card">
+                <div class="card-img">[Image: Egusi]</div>
+                <div class="card-body">
+                    <div class="card-header">
+                        <h3 class="card-title">Signature Egusi</h3>
+                        <span class="card-price">£14.00</span>
+                    </div>
+                    <p class="card-desc">Our Signature Ebile Egusi from Nigeria made with peppers and spices.</p>
+                    <div class="card-footer">
+                        <span class="diet-tags">Contains Melon Seed</span>
+                        <button class="btn btn-dark">Add to Order</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-card">
+                <div class="card-img">[Image: Efo Riro]</div>
+                <div class="card-body">
+                    <div class="card-header">
+                        <h3 class="card-title">Efo Riro</h3>
+                        <span class="card-price">£12.50</span>
+                    </div>
+                    <p class="card-desc">A rich blend of peppers, onion, greens, and spices. Best enjoyed with swallow.</p>
+                    <div class="card-footer">
+                        <span class="diet-tags">Traditional</span>
+                        <button class="btn btn-dark">Add to Order</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-card">
+                <div class="card-img">[Image: Swallow options]</div>
+                <div class="card-body">
+                    <div class="card-header">
+                        <h3 class="card-title">Swallow (Poundo, Amala, Eba)</h3>
+                        <span class="card-price">£4.00</span>
+                    </div>
+                    <p class="card-desc">The perfect traditional accompaniment to be enjoyed with your choice of Soups.</p>
+                    <div class="card-footer">
+                        <span class="diet-tags">GF Options</span>
+                        <button class="btn btn-dark">Add to Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </section>
 
-    <script>
-        function filterMenu(dietType) {
-            const cards = document.querySelectorAll('.menu-card');
-            const buttons = document.querySelectorAll('.filter-btn');
-            
-            // Update button styles
-            buttons.forEach(btn => btn.classList.remove('active'));
-            document.getElementById('btn-' + dietType).classList.add('active');
+    <!-- Professional SEO Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>JB EDEN CATERING</h4>
+                <p>Authentic Afro-Caribbean Cuisine.<br>Green, Fresh, Locally Sourced.</p>
+                <p style="margin-top: 16px;"><strong>Location:</strong><br>Epsom, Surrey, UK</p>
+            </div>
+            <div class="footer-col">
+                <h4>Weekend Takeout Hours</h4>
+                <p>Monday - Thursday: Closed (Pre-orders only)</p>
+                <p>Friday: 4:00 PM - 9:00 PM</p>
+                <p>Saturday: 4:00 PM - 9:00 PM</p>
+                <p>Sunday: 4:00 PM - 9:00 PM</p>
+            </div>
+            <div class="footer-col">
+                <h4>Contact Us</h4>
+                <a href="#">WhatsApp: [Insert Number]</a>
+                <a href="#">Email: [Insert Email]</a>
+                <a href="#">Instagram: @JBEdenCatering</a>
+                <a href="#">Book Catering Services</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 JB Eden Catering. All rights reserved. Providing premium catering services in Epsom and Surrey.
+        </div>
+    </footer>
 
-            // Filter logic
-            cards.forEach(card => {
-                if (dietType === 'all' || card.classList.contains(dietType)) {
-                    card.style.opacity = '1';
-                    card.style.pointerEvents = 'auto';
-                } else {
-                    card.style.opacity = '0.3';
-                    card.style.pointerEvents = 'none';
-                }
-            });
-        }
-    </script>
 </body>
 </html>
