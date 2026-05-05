@@ -325,12 +325,72 @@
 
     <!-- Scripts -->
    <!-- Master Application Logic -->
-    <!-- Master Application Logic -->
-    <!-- Master Application Logic -->
+    <!-- Master Application Logic (API Connected) -->
     <script>
+        // 1. Core State & API Configuration
         let cart = [];
-        const WHATSAPP_NUMBER = "447756346343";
+        const WHATSAPP_NUMBER = "447756346343"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbz5uIkcDDIlVbBeq1QACFm45U4xPmj8pHPhNISydpBkDKanJFKnxW9DQ-ir3mgRwYtn/exec";
 
+        // 2. Initializing App & Fetching Live Data
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMenuFromGoogleSheets();
+        });
+
+        async function loadMenuFromGoogleSheets() {
+            try {
+                const response = await fetch(API_URL);
+                const items = await response.json();
+                renderDynamicMenu(items);
+            } catch (error) {
+                console.error("Failed to load live menu, falling back to cached view.", error);
+                // If the internet is down, it just leaves the hardcoded HTML intact. Safe fallback!
+            }
+        }
+
+        // 3. Dynamic Rendering Engine
+        function renderDynamicMenu(items) {
+            // First, clear the hardcoded HTML grids so we don't have duplicates
+            document.querySelector('#cat-starters .menu-grid').innerHTML = '';
+            document.querySelector('#cat-mains .menu-grid').innerHTML = '';
+            document.querySelector('#cat-soups .menu-grid').innerHTML = '';
+
+            items.forEach(item => {
+                // Safety check: ensure price is a valid number
+                const priceNum = parseFloat(item.price);
+                if (isNaN(priceNum)) return; 
+
+                // Handle Sold Out state directly from the Google Sheet
+                const isSoldOut = item.status && item.status.toString().toLowerCase() === 'sold out';
+                const buttonHTML = isSoldOut 
+                    ? `<button class="btn" style="width: 100%; margin-top: auto; background-color: #9CA3AF; color: white; cursor: not-allowed;" disabled>Sold Out</button>`
+                    : `<button class="btn btn-dark" style="width: 100%; margin-top: auto;" onclick="handleAddToCart(this, '${item.title.replace(/'/g, "\\'")}', ${priceNum})">Add to Cart</button>`;
+
+                // Build the Card HTML
+                const html = `
+                <div class="menu-card">
+                    <div class="card-img" style="font-size: 13px;">[Image: ${item.title}]</div>
+                    <div class="card-body">
+                        <div class="card-header">
+                            <h3 class="card-title">${item.title}</h3>
+                            <span class="card-price">£${priceNum.toFixed(2)}</span>
+                        </div>
+                        <p class="card-desc">${item.description}</p>
+                        ${buttonHTML}
+                    </div>
+                </div>`;
+
+                // Find the correct category tab (must match 'starters', 'mains', or 'soups' in your Sheet)
+                const targetCategory = item.category ? item.category.toLowerCase().trim() : '';
+                const targetGrid = document.querySelector(`#cat-${targetCategory} .menu-grid`);
+                
+                if (targetGrid) {
+                    targetGrid.innerHTML += html; // Inject the card!
+                }
+            });
+        }
+
+        // 4. UI Interactions
         function filterCategory(category) {
             document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('btn-' + category).classList.add('active');
@@ -349,29 +409,9 @@
             document.getElementById('cartOverlay').classList.toggle('active');
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const addButtons = document.querySelectorAll('.menu-card .btn-dark');
-            addButtons.forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const card = e.target.closest('.menu-card');
-                    const title = card.querySelector('.card-title').innerText;
-                    const priceText = card.querySelector('.card-price').innerText;
-                    const price = parseFloat(priceText.replace(/[^0-9.]/g, ''));
-                    
-                    addToCart(title, price);
-                    
-                    const originalText = e.target.innerText;
-                    e.target.innerText = "Added ✓";
-                    e.target.style.backgroundColor = "#10B981";
-                    setTimeout(() => {
-                        e.target.innerText = originalText;
-                        e.target.style.backgroundColor = ""; 
-                    }, 1000);
-                });
-            });
-        });
-
-        function addToCart(title, price) {
+        // 5. Cart Logic
+        function handleAddToCart(btnElement, title, price) {
+            // Add to the backend array
             const existingItem = cart.find(item => item.title === title);
             if (existingItem) {
                 existingItem.qty += 1;
@@ -379,6 +419,15 @@
                 cart.push({ title, price, qty: 1 });
             }
             updateCartUI();
+
+            // Provide visual feedback
+            const originalText = btnElement.innerText;
+            btnElement.innerText = "Added ✓";
+            btnElement.style.backgroundColor = "#10B981";
+            setTimeout(() => {
+                btnElement.innerText = originalText;
+                btnElement.style.backgroundColor = ""; 
+            }, 1000);
         }
 
         function updateCartUI() {
@@ -388,8 +437,8 @@
             
             let total = 0;
             let itemCount = 0;
-            
             let itemsHTML = '';
+            
             if (cart.length === 0) {
                 cartBody.innerHTML = `
                     <div style="text-align: center; color: #4B5563; margin-top: 40px;">
@@ -415,7 +464,6 @@
                 `;
             });
             
-            // Build the dynamic checkout form WITH the Urgency Toggle
             itemsHTML += `
                 <div class="checkout-form" style="margin-top: 24px; border-top: 2px solid #E5E7EB; padding-top: 24px; padding-bottom: 24px;">
                     <h4 style="margin-bottom: 16px; font-family: 'Montserrat', sans-serif;">Checkout Details</h4>
@@ -438,7 +486,6 @@
                         <textarea id="custAddress" rows="2" style="width: 100%; padding: 10px; border: 1px solid #E5E7EB; border-radius: 6px;" placeholder="123 Main St, Surrey, KT19..."></textarea>
                     </div>
 
-                    <!-- NEW: The Urgency Toggle -->
                     <div style="margin-bottom: 16px;">
                         <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px;">How soon do you need this?</label>
                         <select id="custUrgency" style="width: 100%; padding: 10px; border: 1px solid #E5E7EB; border-radius: 6px; background-color: #FEF3C7;">
@@ -490,6 +537,7 @@
             updateCartUI();
         }
 
+        // 6. Final Checkout Compiler
         function checkoutWhatsApp(total) {
             const name = document.getElementById('custName').value.trim();
             const method = document.getElementById('custMethod').value;
