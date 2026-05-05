@@ -326,6 +326,7 @@
     <!-- Scripts -->
    <!-- Master Application Logic -->
     <!-- Master Application Logic -->
+    <!-- Master Application Logic -->
     <script>
         let cart = [];
         const WHATSAPP_NUMBER = "447756346343";
@@ -397,7 +398,7 @@
                     </div>`;
                 floatingBtn.innerText = `🛒 View Cart (0)`;
                 navBtn.innerText = `Cart (0)`;
-                return; // Exit early if cart is empty
+                return;
             } 
             
             cart.forEach((item, index) => {
@@ -414,7 +415,7 @@
                 `;
             });
             
-            // Build the dynamic checkout form WITH the conditional address field
+            // Build the dynamic checkout form WITH the Urgency Toggle
             itemsHTML += `
                 <div class="checkout-form" style="margin-top: 24px; border-top: 2px solid #E5E7EB; padding-top: 24px; padding-bottom: 24px;">
                     <h4 style="margin-bottom: 16px; font-family: 'Montserrat', sans-serif;">Checkout Details</h4>
@@ -432,10 +433,18 @@
                         </select>
                     </div>
 
-                    <!-- Hidden by default, shows when Delivery is selected -->
                     <div id="addressGroup" style="display: none; margin-bottom: 16px;">
                         <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px;">Delivery Address *</label>
                         <textarea id="custAddress" rows="2" style="width: 100%; padding: 10px; border: 1px solid #E5E7EB; border-radius: 6px;" placeholder="123 Main St, Surrey, KT19..."></textarea>
+                    </div>
+
+                    <!-- NEW: The Urgency Toggle -->
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px;">How soon do you need this?</label>
+                        <select id="custUrgency" style="width: 100%; padding: 10px; border: 1px solid #E5E7EB; border-radius: 6px; background-color: #FEF3C7;">
+                            <option value="ASAP (Urgent)">🔥 ASAP (Urgent)</option>
+                            <option value="No Rush (Take your time)">🕒 No Rush (Take your time)</option>
+                        </select>
                     </div>
 
                     <div style="margin-bottom: 16px;">
@@ -450,13 +459,12 @@
                         Acc No: 12345678
                     </div>
 
-                    <!-- The persistent footer injected at the bottom of the scroll -->
                     <div style="border-top: 1px solid #E5E7EB; padding-top: 16px; margin-top: 16px;">
                         <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 20px; margin-bottom: 16px; font-family: 'Montserrat', sans-serif;">
                             <span>Total:</span>
                             <span>£${total.toFixed(2)}</span>
                         </div>
-                        <button onclick="checkoutWhatsApp(${total}, ${itemCount})" style="background: #25D366; color: white; width: 100%; padding: 16px; border: none; border-radius: 8px; font-weight: 800; font-size: 16px; cursor: pointer;">
+                        <button onclick="checkoutWhatsApp(${total})" style="background: #25D366; color: white; width: 100%; padding: 16px; border: none; border-radius: 8px; font-weight: 800; font-size: 16px; cursor: pointer;">
                             Checkout via WhatsApp
                         </button>
                     </div>
@@ -467,7 +475,6 @@
             floatingBtn.innerText = `🛒 View Cart (${itemCount})`;
             navBtn.innerText = `Cart (${itemCount})`;
 
-            // Attach the event listener for the Delivery Address toggle
             document.getElementById('custMethod').addEventListener('change', function() {
                 const addressGroup = document.getElementById('addressGroup');
                 if (this.value === 'Delivery') {
@@ -483,10 +490,11 @@
             updateCartUI();
         }
 
-        function checkoutWhatsApp(total, itemCount) {
+        function checkoutWhatsApp(total) {
             const name = document.getElementById('custName').value.trim();
             const method = document.getElementById('custMethod').value;
             const address = document.getElementById('custAddress') ? document.getElementById('custAddress').value.trim() : '';
+            const urgency = document.getElementById('custUrgency').value;
             const notes = document.getElementById('custNotes').value.trim();
 
             if (!name) {
@@ -499,15 +507,13 @@
                 return;
             }
 
-            // Calculate estimated prep time (15 mins base + 5 mins per item)
-            const prepTime = 15 + (itemCount * 5);
-
             let msg = `*NEW TAKEOUT ORDER* 🍲\n\n`;
             msg += `*Name:* ${name}\n`;
             msg += `*Method:* ${method}\n`;
             if (method === 'Delivery') {
                 msg += `*Address:* ${address}\n`;
             }
+            msg += `*Timing:* ${urgency}\n`;
             if (notes) msg += `*Notes:* ${notes}\n`;
             msg += `\n*ORDER DETAILS:*\n`;
             
@@ -516,8 +522,7 @@
             });
             
             msg += `\n*TOTAL DUE:* £${total.toFixed(2)}\n`;
-            msg += `\n_Auto-Estimate Prep Time: ~${prepTime} mins_`;
-            msg += `\n_Please confirm receipt and expected time._`;
+            msg += `\n_Please confirm receipt!_`;
 
             const encodedMsg = encodeURIComponent(msg);
             const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMsg}`;
